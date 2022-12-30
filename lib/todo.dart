@@ -38,6 +38,23 @@ class _TodoState extends State<Todo> {
     });
   }
 
+  dynamic deleteTodo(id) async {
+    var databasesPath = await getDatabasesPath();
+
+    Database db = await openDatabase(
+      databasesPath + 'todos.db',
+      version: 1,
+      onCreate: (Database db, int version) async {
+        // When creating the db, create the table
+        await db.execute(
+            'CREATE TABLE todos (id INTEGER PRIMARY KEY, title TEXT, message TEXT)');
+      },
+    );
+
+    await db.rawDelete('DELETE FROM todos WHERE id = ?', [id]);
+    fetchAllTodos();
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -74,14 +91,21 @@ class _TodoState extends State<Todo> {
               : ListView.builder(
                   itemBuilder: (context, index) {
                     return Dismissible(
+                      background: Container(
+                        color: Colors.red,
+                        child: Icon(
+                          Icons.delete_outline_sharp,
+                          color: Colors.white,
+                        ),
+                      ),
                       key: Key(index.toString()),
                       child: ListTile(
                         title: Text(todos[index]["title"]),
                         subtitle: Text(todos[index]["message"]),
                         onTap: () {},
                       ),
-                      onDismissed: (Di){
-
+                      onDismissed: (DismissDirection) {
+                        deleteTodo(todos[index]["id"]);
                       },
                     );
                   },
