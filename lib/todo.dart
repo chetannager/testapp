@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:testapp/EditTodo.dart';
 import 'package:testapp/addtodo.dart';
 
 class Todo extends StatefulWidget {
@@ -102,7 +103,17 @@ class _TodoState extends State<Todo> {
                       child: ListTile(
                         title: Text(todos[index]["title"]),
                         subtitle: Text(todos[index]["message"]),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => EditTodo(
+                                      todos[index]["id"],
+                                      todos[index]["title"],
+                                      todos[index]["message"]))).then((value) {
+                            fetchAllTodos();
+                          });
+                        },
                       ),
                       onDismissed: (DismissDirection) {
                         deleteTodo(todos[index]["id"]);

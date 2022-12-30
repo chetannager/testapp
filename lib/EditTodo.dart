@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
 class EditTodo extends StatefulWidget {
-  const EditTodo({Key? key}) : super(key: key);
+  int id;
+  String title;
+  String message;
+
+  EditTodo(this.id, this.title, this.message);
 
   @override
   State<EditTodo> createState() => _EditTodoState();
@@ -12,7 +16,7 @@ class _EditTodoState extends State<EditTodo> {
   final titleController = TextEditingController();
   final messageController = TextEditingController();
 
-  dynamic addTodo(title, message) async {
+  dynamic updateTodo(id, title, message) async {
     var databasesPath = await getDatabasesPath();
 
     Database db = await openDatabase(
@@ -25,10 +29,19 @@ class _EditTodoState extends State<EditTodo> {
       },
     );
 
-    int id = await db.rawInsert(
-        'INSERT INTO todos(id, title, message) VALUES(?,?,?)',
-        [DateTime.now().millisecondsSinceEpoch, title, message]);
+    int count = await db.rawUpdate(
+        'UPDATE todos SET title = ?, message = ? WHERE id = ?',
+        [title, message, id]);
+
     Navigator.pop(context, "isTodoAdded");
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    titleController.text = widget.title;
+    messageController.text = widget.message;
   }
 
   @override
@@ -47,9 +60,10 @@ class _EditTodoState extends State<EditTodo> {
           ),
           RaisedButton(
             onPressed: () {
-              addTodo(titleController.text, messageController.text);
+              updateTodo(
+                  widget.id, titleController.text, messageController.text);
             },
-            child: const Text("Add"),
+            child: const Text("Update"),
           )
         ],
       ),
