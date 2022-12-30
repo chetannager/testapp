@@ -42,9 +42,15 @@ class _AddTodoState extends State<AddTodo> {
         children: [
           TextField(
             controller: titleController,
+            decoration: InputDecoration(
+              label: Text("Title")
+            ),
           ),
           TextField(
             controller: messageController,
+            decoration: InputDecoration(
+                label: Text("Message")
+            ),
           ),
           RaisedButton(
             onPressed: () {
